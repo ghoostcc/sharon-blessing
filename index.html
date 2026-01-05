@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>給 Sharon 的祝福</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to bottom, #0a0e27 0%, #1a1a3e 50%, #2d1b4e 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* 星空背景 */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* 主容器 */
+        .container {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .question {
+            color: #e0e0ff;
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #e0e0ff;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* 成功訊息 */
+        .success-message {
+            display: none;
+            text-align: center;
+            color: white;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s;
+        }
+
+        .success-text {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .success-subtext {
+            font-size: 16px;
+            color: #e0e0ff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .question {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 星空背景 -->
+    <div class="stars" id="stars"></div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <div id="formContent">
+            <h1>✨ 給 Sharon 的祝福 ✨</h1>
+            <p class="question">請寫下你想對 Sharon 說的一句話</p>
+            
+            <div class="input-group">
+                <label for="nameInput">你的姓名</label>
+                <input type="text" id="nameInput" placeholder="請輸入你的姓名">
+            </div>
+
+            <div class="input-group">
+                <label for="blessingInput">你的祝福</label>
+                <textarea id="blessingInput" placeholder="在這裡寫下你的祝福..."></textarea>
+            </div>
+
+            <button id="submitBtn" onclick="submitBlessing()">送出祝福</button>
+            <p class="error-message" id="errorMessage"></p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">⭐</div>
+            <div class="success-text">你的祝福已送出</div>
+            <div class="success-subtext">謝謝你的祝福 💫</div>
+        </div>
+    </div>
+
+    <script>
+        // Google Apps Script 網址
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk23JjUafTXn8jV3-0ayzGtITFgWZU3EfYMH43pVOdCQj1WAx5NxHhDF83a_4GdN8/exec';
+
+        // 生成星空
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 100;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // 送出祝福
+        async function submitBlessing() {
+            const nameInput = document.getElementById('nameInput');
+            const blessingInput = document.getElementById('blessingInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            const name = nameInput.value.trim();
+            const blessing = blessingInput.value.trim();
+
+            // 清除錯誤訊息
+            errorMessage.classList.remove('show');
+            errorMessage.textContent = '';
+
+            // 驗證輸入
+            if (!name) {
+                errorMessage.textContent = '請輸入你的姓名';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            if (!blessing) {
+                errorMessage.textContent = '請輸入祝福內容';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // 檢查網址是否已設定
+            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                errorMessage.textContent = '請先設定 Google Apps Script 網址';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // 停用按鈕
+            submitBtn.disabled = true;
+            submitBtn.textContent = '送出中...';
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        name: name,
+                        blessing: blessing 
+                    })
+                });
+
+                // 因為使用 no-cors,我們無法讀取回應
+                // 假設成功並顯示成功訊息
+                document.getElementById('formContent').style.display = 'none';
+                document.getElementById('successMessage').classList.add('show');
+
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = '送出失敗,請稍後再試';
+                errorMessage.classList.add('show');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '送出祝福';
+            }
+        }
+
+        // 頁面載入時生成星空
+        window.onload = createStars;
+
+        // 支援 Enter 送出(在 textarea 中 Enter 不送出,只有在 name input 才會)
+        document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitBlessing();
+            }
+        });
+    </script>
+</body>
+</html>
