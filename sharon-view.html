@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sharon 的祝福</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            overflow: hidden;
+            background: #0a0e27;
+        }
+
+        /* 頁面容器 */
+        .page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        /* === 第一頁:名字驗證 === */
+        #namePage {
+            background: linear-gradient(to bottom, #0a0e27 0%, #1a1a3e 50%, #2d1b4e 100%);
+            position: relative;
+        }
+
+        .stars-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .star-bg {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .name-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .name-container h1 {
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .name-container input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .name-container input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+        }
+
+        .name-container button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .name-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .error-text {
+            color: #ff6b6b;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-text.show {
+            display: block;
+        }
+
+        /* === 第二頁:動畫場景 === */
+        #animationPage {
+            background: linear-gradient(to bottom, #0a0e27 0%, #1a1a3e 40%, #2d4a2e 100%);
+        }
+
+        .scene {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 星空 */
+        .night-sky {
+            position: absolute;
+            width: 100%;
+            height: 70%;
+            top: 0;
+        }
+
+        .star-anim {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        /* 草地 */
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 30%;
+            background: linear-gradient(to bottom, #2d4a2e 0%, #1a3a1a 100%);
+        }
+
+        .grass {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 20px;
+            background: repeating-linear-gradient(
+                90deg,
+                #3a5a3a 0px,
+                #2d4a2e 2px,
+                #3a5a3a 4px
+            );
+        }
+
+        /* 角色 */
+        .character {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 120px;
+            z-index: 5;
+        }
+
+        .character-body {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 50px;
+            background: #8b7355;
+            border-radius: 20px 20px 10px 10px;
+        }
+
+        .character-head {
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            height: 35px;
+            background: #d4a574;
+            border-radius: 50%;
+        }
+
+        .character-hair {
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 38px;
+            height: 20px;
+            background: #3d2817;
+            border-radius: 50% 50% 0 0;
+        }
+
+        /* 倒數計時 */
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            z-index: 100;
+            animation: countdownAnim 1s ease-out;
+        }
+
+        @keyframes countdownAnim {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* 流星 */
+        .meteor {
+            position: absolute;
+            width: 3px;
+            height: 80px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: meteorFall 1.5s ease-in;
+        }
+
+        @keyframes meteorFall {
+            0% {
+                opacity: 1;
+                transform: translateY(-100px) translateX(0) rotate(45deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) translateX(-200px) rotate(45deg);
+            }
+        }
+
+        /* === 第三頁:信封與星星 === */
+        #envelopePage {
+            background: linear-gradient(to bottom, #1a1a3e 0%, #2d1b4e 100%);
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .envelope-container {
+            position: relative;
+            width: 280px;
+            height: 180px;
+            margin-bottom: 40px;
+        }
+
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .envelope-back {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f4e4c1 0%, #e8d4a8 100%);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(135deg, #e8d4a8 0%, #d4c4a0 100%);
+            clip-path: polygon(0 0, 50% 60%, 100% 0);
+            transform-origin: top center;
+        }
+
+        .envelope-front {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 55%;
+            background: linear-gradient(135deg, #f4e4c1 0%, #e8d4a8 100%);
+            border-radius: 0 0 10px 10px;
+        }
+
+        .stars-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            max-width: 90%;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .blessing-star {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            animation: starFloat 3s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .blessing-star:nth-child(2n) {
+            animation-delay: 0.5s;
+        }
+
+        .blessing-star:nth-child(3n) {
+            animation-delay: 1s;
+        }
+
+        .blessing-star:hover {
+            transform: scale(1.2) rotate(10deg);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+
+        @keyframes starFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* 祝福彈窗 */
+        .blessing-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .blessing-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .blessing-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            animation: scaleIn 0.3s;
+        }
+
+        .blessing-from {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .blessing-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .loading {
+            color: white;
+            font-size: 18px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 第一頁:名字驗證 -->
+    <div id="namePage" class="page active">
+        <div class="stars-bg"></div>
+        <div class="name-container">
+            <h1>✨ 請輸入你的名字 ✨</h1>
+            <input type="text" id="nameInput" placeholder="輸入名字...">
+            <button onclick="checkName()">確認</button>
+            <p class="error-text" id="nameError"></p>
+        </div>
+    </div>
+
+    <!-- 第二頁:動畫場景 -->
+    <div id="animationPage" class="page">
+        <div class="scene">
+            <div class="night-sky" id="nightSky"></div>
+            <div class="ground">
+                <div class="grass"></div>
+            </div>
+            <div class="character">
+                <div class="character-head">
+                    <div class="character-hair"></div>
+                </div>
+                <div class="character-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第三頁:信封與星星 -->
+    <div id="envelopePage" class="page">
+        <div class="envelope-container">
+            <div class="envelope">
+                <div class="envelope-back"></div>
+                <div class="envelope-flap"></div>
+                <div class="envelope-front"></div>
+            </div>
+        </div>
+        <div class="stars-container" id="starsContainer">
+            <div class="loading">載入祝福中...</div>
+        </div>
+    </div>
+
+    <!-- 祝福彈窗 -->
+    <div class="blessing-modal" id="blessingModal">
+        <div class="blessing-content">
+            <div class="blessing-from" id="blessingFrom"></div>
+            <div class="blessing-text" id="blessingText"></div>
+            <button class="close-btn" onclick="closeModal()">關閉</button>
+        </div>
+    </div>
+
+    <script>
+        // Google Apps Script 網址
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk23JjUafTXn8jV3-0ayzGtITFgWZU3EfYMH43pVOdCQj1WAx5NxHhDF83a_4GdN8/exec';
+
+        // 生成星空背景
+        function createStarsBackground() {
+            const container = document.querySelector('.stars-bg');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-bg';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(star);
+            }
+        }
+
+        // 檢查名字
+        function checkName() {
+            const input = document.getElementById('nameInput');
+            const error = document.getElementById('nameError');
+            const name = input.value.trim().toLowerCase();
+
+            error.classList.remove('show');
+
+            if (!name) {
+                error.textContent = '請輸入名字';
+                error.classList.add('show');
+                return;
+            }
+
+            if (name !== 'sharon') {
+                error.textContent = '名字不正確哦';
+                error.classList.add('show');
+                return;
+            }
+
+            // 名字正確,進入動畫頁面
+            startAnimation();
+        }
+
+        // 開始動畫
+        function startAnimation() {
+            document.getElementById('namePage').classList.remove('active');
+            document.getElementById('animationPage').classList.add('active');
+
+            // 生成夜空星星
+            const nightSky = document.getElementById('nightSky');
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-anim';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 70 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                nightSky.appendChild(star);
+            }
+
+            // 3秒後開始倒數
+            setTimeout(() => {
+                startCountdown();
+            }, 3000);
+        }
+
+        // 倒數計時
+        function startCountdown() {
+            const scene = document.querySelector('.scene');
+            const numbers = [3, 2, 1];
+            let index = 0;
+
+            function showNumber() {
+                if (index < numbers.length) {
+                    const countdown = document.createElement('div');
+                    countdown.className = 'countdown';
+                    countdown.textContent = numbers[index];
+                    scene.appendChild(countdown);
+
+                    setTimeout(() => {
+                        countdown.remove();
+                    }, 1000);
+
+                    index++;
+                    setTimeout(showNumber, 1000);
+                } else {
+                    // 倒數結束,開始流星雨
+                    setTimeout(startMeteorShower, 500);
+                }
+            }
+
+            showNumber();
+        }
+
+        // 流星雨
+        function startMeteorShower() {
+            const scene = document.querySelector('.scene');
+            let meteorCount = 0;
+            const maxMeteors = 15;
+
+            const meteorInterval = setInterval(() => {
+                if (meteorCount >= maxMeteors) {
+                    clearInterval(meteorInterval);
+                    // 流星雨結束後跳轉到信封頁面
+                    setTimeout(showEnvelopePage, 1000);
+                    return;
+                }
+
+                const meteor = document.createElement('div');
+                meteor.className = 'meteor';
+                meteor.style.left = Math.random() * 100 + '%';
+                meteor.style.top = Math.random() * 50 + '%';
+                meteor.style.animationDelay = Math.random() * 0.3 + 's';
+                scene.appendChild(meteor);
+
+                setTimeout(() => {
+                    meteor.remove();
+                }, 2000);
+
+                meteorCount++;
+            }, 200);
+        }
+
+        // 顯示信封頁面
+        async function showEnvelopePage() {
+            document.getElementById('animationPage').classList.remove('active');
+            document.getElementById('envelopePage').classList.add('active');
+
+            // 載入祝福資料
+            await loadBlessings();
+        }
+
+        // 載入祝福
+        async function loadBlessings() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+
+                if (data.status === 'success' && data.data.length > 0) {
+                    displayBlessings(data.data);
+                } else {
+                    document.getElementById('starsContainer').innerHTML = '<div class="loading">目前還沒有祝福</div>';
+                }
+            } catch (error) {
+                console.error('Error loading blessings:', error);
+                document.getElementById('starsContainer').innerHTML = '<div class="loading">載入失敗</div>';
+            }
+        }
+
+        // 顯示祝福星星
+        function displayBlessings(blessings) {
+            const container = document.getElementById('starsContainer');
+            container.innerHTML = '';
+
+            blessings.forEach((blessing, index) => {
+                const star = document.createElement('div');
+                star.className = 'blessing-star';
+                star.onclick = () => showBlessing(blessing);
+                container.appendChild(star);
+            });
+        }
+
+        // 顯示祝福內容
+        function showBlessing(blessing) {
+            document.getElementById('blessingFrom').textContent = `來自 ${blessing.name}`;
+            document.getElementById('blessingText').textContent = blessing.blessing;
+            document.getElementById('blessingModal').classList.add('show');
+        }
+
+        // 關閉彈窗
+        function closeModal() {
+            document.getElementById('blessingModal').classList.remove('show');
+        }
+
+        // 初始化
+        window.onload = () => {
+            createStarsBackground();
+        };
+
+        // Enter 鍵也可以確認
+        document.getElementById('nameInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkName();
+            }
+        });
+    </script>
+</body>
+</html>
