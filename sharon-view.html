@@ -158,20 +158,22 @@
             bottom: 0;
             width: 100%;
             height: 30%;
-            background: linear-gradient(to bottom, #2d4a2e 0%, #1a3a1a 100%);
+            background: linear-gradient(to bottom, #3a5a3a 0%, #2d4a2e 50%, #1e3a1e 100%);
         }
 
         .grass {
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 20px;
-            background: repeating-linear-gradient(
-                90deg,
-                #3a5a3a 0px,
-                #2d4a2e 2px,
-                #3a5a3a 4px
-            );
+            height: 100%;
+        }
+
+        .grass-blade {
+            position: absolute;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to top, #2d5a2d, #4a8a4a);
+            border-radius: 50% 50% 0 0;
         }
 
         /* 角色 */
@@ -251,22 +253,30 @@
         /* 流星 */
         .meteor {
             position: absolute;
-            width: 3px;
-            height: 80px;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+            width: 4px;
+            height: 120px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 30%, rgba(135,206,250,0.8) 60%, rgba(255,255,255,0) 100%);
             border-radius: 50%;
             opacity: 0;
-            animation: meteorFall 1.5s ease-in;
+            transform: rotate(-45deg);
+            box-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(135,206,250,0.6);
+            animation: meteorFall 2s ease-in;
         }
 
         @keyframes meteorFall {
             0% {
+                opacity: 0;
+                transform: translate(0, 0) rotate(-45deg);
+            }
+            10% {
                 opacity: 1;
-                transform: translateY(-100px) translateX(0) rotate(45deg);
+            }
+            90% {
+                opacity: 1;
             }
             100% {
                 opacity: 0;
-                transform: translateY(100vh) translateX(-200px) rotate(45deg);
+                transform: translate(-150vw, 100vh) rotate(-45deg);
             }
         }
 
@@ -333,13 +343,46 @@
         .blessing-star {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            position: relative;
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
             animation: starFloat 3s ease-in-out infinite;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+        }
+
+        .blessing-star::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffc107 100%);
+            clip-path: polygon(
+                50% 0%, 
+                61% 35%, 
+                98% 35%, 
+                68% 57%, 
+                79% 91%, 
+                50% 70%, 
+                21% 91%, 
+                32% 57%, 
+                2% 35%, 
+                39% 35%
+            );
+            border-radius: 10%;
+        }
+
+        .blessing-star::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
         }
 
         .blessing-star:nth-child(2n) {
@@ -351,8 +394,8 @@
         }
 
         .blessing-star:hover {
-            transform: scale(1.2) rotate(10deg);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            transform: scale(1.3) rotate(15deg);
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1));
         }
 
         @keyframes starFloat {
@@ -448,7 +491,7 @@
         <div class="scene">
             <div class="night-sky" id="nightSky"></div>
             <div class="ground">
-                <div class="grass"></div>
+                <div class="grass" id="grassContainer"></div>
             </div>
             <div class="character">
                 <div class="character-head">
@@ -543,6 +586,17 @@
                 nightSky.appendChild(star);
             }
 
+            // 生成草地
+            const grassContainer = document.getElementById('grassContainer');
+            for (let i = 0; i < 200; i++) {
+                const blade = document.createElement('div');
+                blade.className = 'grass-blade';
+                blade.style.left = Math.random() * 100 + '%';
+                blade.style.height = (Math.random() * 15 + 10) + 'px';
+                blade.style.animationDelay = Math.random() * 2 + 's';
+                grassContainer.appendChild(blade);
+            }
+
             // 3秒後開始倒數
             setTimeout(() => {
                 startCountdown();
@@ -581,7 +635,7 @@
         function startMeteorShower() {
             const scene = document.querySelector('.scene');
             let meteorCount = 0;
-            const maxMeteors = 15;
+            const maxMeteors = 20;
 
             const meteorInterval = setInterval(() => {
                 if (meteorCount >= maxMeteors) {
@@ -593,17 +647,19 @@
 
                 const meteor = document.createElement('div');
                 meteor.className = 'meteor';
-                meteor.style.left = Math.random() * 100 + '%';
-                meteor.style.top = Math.random() * 50 + '%';
-                meteor.style.animationDelay = Math.random() * 0.3 + 's';
+                // 從右上方開始
+                meteor.style.right = (Math.random() * 30) + '%';
+                meteor.style.top = (Math.random() * 30) + '%';
+                meteor.style.animationDelay = '0s';
+                meteor.style.animationDuration = (Math.random() * 0.5 + 1.5) + 's';
                 scene.appendChild(meteor);
 
                 setTimeout(() => {
                     meteor.remove();
-                }, 2000);
+                }, 2500);
 
                 meteorCount++;
-            }, 200);
+            }, 150);
         }
 
         // 顯示信封頁面
