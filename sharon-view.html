@@ -139,6 +139,14 @@
             overflow: hidden;
         }
 
+        /* Canvas 流星 */
+        #meteorCanvas {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+        }
+
         /* 星空 */
         .night-sky {
             position: absolute;
@@ -152,49 +160,6 @@
             background: white;
             border-radius: 50%;
             animation: twinkle 2s infinite;
-        }
-
-        /* 角色 */
-        .character {
-            position: absolute;
-            bottom: 15%;
-            left: 15%;
-            width: 80px;
-            height: 100px;
-            z-index: 5;
-        }
-
-        .character-body {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 35px;
-            height: 45px;
-            background: #f4d03f;
-            border-radius: 18px 18px 8px 8px;
-        }
-
-        .character-head {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 30px;
-            background: #f4d03f;
-            border-radius: 50%;
-        }
-
-        .character-hair {
-            position: absolute;
-            top: -3px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 32px;
-            height: 15px;
-            background: #f4d03f;
-            border-radius: 50% 50% 0 0;
         }
 
         /* 倒數計時 */
@@ -227,37 +192,7 @@
             }
         }
 
-        /* 流星 */
-        .meteor {
-            position: absolute;
-            width: 5px;
-            height: 150px;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 20%, rgba(135,206,250,0.9) 50%, rgba(255,255,255,0) 100%);
-            border-radius: 50%;
-            opacity: 0;
-            transform: rotate(-45deg);
-            box-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 30px rgba(135,206,250,0.7);
-            animation: meteorFall 2.5s ease-in;
-        }
-
-        @keyframes meteorFall {
-            0% {
-                opacity: 0;
-                transform: translate(0, 0) rotate(-45deg);
-            }
-            5% {
-                opacity: 1;
-            }
-            95% {
-                opacity: 0.8;
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-120vw, 120vh) rotate(-45deg);
-            }
-        }
-
-        /* 祝福文字 */
+        /* 祝福文字 - 修正不跳動 */
         .blessing-text-overlay {
             position: absolute;
             top: 50%;
@@ -279,9 +214,10 @@
             color: white;
             font-size: 20px;
             line-height: 1.8;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-            margin-bottom: 12px;
+            min-height: 1.8em;
+            white-space: nowrap;
             opacity: 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
             font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
             font-weight: 400;
         }
@@ -517,13 +453,8 @@
     <!-- 第二頁:動畫場景 -->
     <div id="animationPage" class="page">
         <div class="scene">
+            <canvas id="meteorCanvas"></canvas>
             <div class="night-sky" id="nightSky"></div>
-            <div class="character">
-                <div class="character-head">
-                    <div class="character-hair"></div>
-                </div>
-                <div class="character-body"></div>
-            </div>
             <div class="blessing-text-overlay" id="blessingTextOverlay">
                 <div class="blessing-line" id="line1">白日,你是溫暖的陽光</div>
                 <div class="blessing-line" id="line2">溫柔而堅定,指引著每一段旅程</div>
@@ -607,7 +538,6 @@
                 return;
             }
 
-            // 名字正確,進入動畫頁面
             startAnimation();
         }
 
@@ -629,7 +559,6 @@
                 nightSky.appendChild(star);
             }
 
-            // 3秒後開始倒數
             setTimeout(() => {
                 startCountdown();
             }, 3000);
@@ -662,80 +591,123 @@
             showNumber();
         }
 
-        // 流星雨
-        function startMeteorShower() {
-            const scene = document.querySelector('.scene');
-            let meteorCount = 0;
-            const maxMeteors = 25;
+        // Canvas 流星雨系統
+        let canvas, ctx, meteors = [], running = false;
 
-            const meteorInterval = setInterval(() => {
-                if (meteorCount >= maxMeteors) {
-                    clearInterval(meteorInterval);
-                    setTimeout(showBlessingText, 1000);
-                    return;
-                }
-
-                const meteor = document.createElement('div');
-                meteor.className = 'meteor';
-                // 從右上角區域開始
-                meteor.style.right = (Math.random() * 20) + '%';
-                meteor.style.top = (Math.random() * 20) + '%';
-                meteor.style.animationDelay = '0s';
-                meteor.style.animationDuration = (Math.random() * 0.8 + 2) + 's';
-                scene.appendChild(meteor);
-
-                setTimeout(() => {
-                    meteor.remove();
-                }, 3000);
-
-                meteorCount++;
-            }, 120);
+        function initMeteor() {
+            canvas = document.getElementById('meteorCanvas');
+            ctx = canvas.getContext('2d');
+            resize();
+            window.addEventListener('resize', resize);
         }
 
-        // 顯示祝福文字(逐行逐字)
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Meteor {
+            constructor() {
+                this.x = Math.random() * canvas.width * 0.8 + canvas.width * 0.2;
+                this.y = Math.random() * canvas.height * 0.2;
+                this.len = Math.random() * 150 + 150;
+                this.spd = Math.random() * 2 + 2;
+                this.a = Math.PI / 4;
+                this.alpha = 1;
+            }
+
+            update() {
+                this.x -= Math.cos(this.a) * this.spd * 5;
+                this.y += Math.sin(this.a) * this.spd * 5;
+                this.alpha -= 0.01;
+                return this.alpha > 0;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                const x2 = this.x + Math.cos(this.a) * this.len;
+                const y2 = this.y - Math.sin(this.a) * this.len;
+                const g = ctx.createLinearGradient(this.x, this.y, x2, y2);
+                g.addColorStop(0, 'white');
+                g.addColorStop(0.5, 'lightskyblue');
+                g.addColorStop(1, 'transparent');
+                ctx.strokeStyle = g;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        function startMeteorShower() {
+            running = true;
+            meteors = [];
+            let count = 0;
+            const interval = setInterval(() => {
+                meteors.push(new Meteor());
+                if (++count >= 25) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        running = false;
+                        showBlessingText();
+                    }, 1000);
+                }
+            }, 120);
+            animate();
+        }
+
+        function animate() {
+            if (!running && meteors.length === 0) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            meteors = meteors.filter(m => {
+                m.draw();
+                return m.update();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        // 顯示祝福文字 - 修正不跳動版本
         function showBlessingText() {
             const overlay = document.getElementById('blessingTextOverlay');
             overlay.classList.add('show');
 
-            const lines = [
+            const ids = [
                 'line1', 'line2', 'line3', 'line4', 
                 'line5', 'line6', 'line7', 'line8', 'line9'
             ];
+            let i = 0;
 
-            let currentLine = 0;
+            function showNext() {
+                if (i < ids.length) {
+                    const el = document.getElementById(ids[i]);
+                    const text = el.textContent;
+                    el.textContent = '　'; // 全形空白佔位,防止跳動
+                    el.style.opacity = 1;
 
-            function showNextLine() {
-                if (currentLine < lines.length) {
-                    const lineElement = document.getElementById(lines[currentLine]);
-                    const text = lineElement.textContent;
-                    lineElement.textContent = '';
-                    lineElement.style.opacity = 1;
-
-                    let charIndex = 0;
+                    let c = 0;
                     const charInterval = setInterval(() => {
-                        if (charIndex < text.length) {
-                            lineElement.textContent += text[charIndex];
-                            charIndex++;
-                        } else {
+                        el.textContent += text[c++] || '';
+                        if (c > text.length) {
                             clearInterval(charInterval);
-                            currentLine++;
-                            setTimeout(showNextLine, 300);
+                            i++;
+                            setTimeout(showNext, 300);
                         }
-                    }, 100);
+                    }, 80);
                 } else {
                     setTimeout(showEnvelopePage, 2000);
                 }
             }
 
-            showNextLine();
+            showNext();
         }
 
         // 顯示信封頁面
         async function showEnvelopePage() {
             document.getElementById('animationPage').classList.remove('active');
             document.getElementById('envelopePage').classList.add('active');
-
-            // 載入祝福資料
             await loadBlessings();
         }
 
@@ -762,7 +734,6 @@
         function showStarsGallery() {
             document.getElementById('envelopePage').classList.remove('active');
             document.getElementById('starsGalleryPage').classList.add('active');
-
             displayBlessings();
         }
 
@@ -799,6 +770,7 @@
         // 初始化
         window.onload = () => {
             createStarsBackground();
+            initMeteor();
         };
 
         // Enter 鍵確認
