@@ -158,10 +158,9 @@
         .character {
             position: absolute;
             bottom: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 120px;
+            left: 15%;
+            width: 80px;
+            height: 100px;
             z-index: 5;
         }
 
@@ -170,31 +169,31 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 40px;
-            height: 50px;
-            background: #8b7355;
-            border-radius: 20px 20px 10px 10px;
+            width: 35px;
+            height: 45px;
+            background: #f4d03f;
+            border-radius: 18px 18px 8px 8px;
         }
 
         .character-head {
             position: absolute;
-            bottom: 45px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            width: 35px;
-            height: 35px;
-            background: #d4a574;
+            width: 30px;
+            height: 30px;
+            background: #f4d03f;
             border-radius: 50%;
         }
 
         .character-hair {
             position: absolute;
-            top: -5px;
+            top: -3px;
             left: 50%;
             transform: translateX(-50%);
-            width: 38px;
-            height: 20px;
-            background: #3d2817;
+            width: 32px;
+            height: 15px;
+            background: #f4d03f;
             border-radius: 50% 50% 0 0;
         }
 
@@ -231,30 +230,30 @@
         /* 流星 */
         .meteor {
             position: absolute;
-            width: 4px;
-            height: 120px;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 30%, rgba(135,206,250,0.8) 60%, rgba(255,255,255,0) 100%);
+            width: 5px;
+            height: 150px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 20%, rgba(135,206,250,0.9) 50%, rgba(255,255,255,0) 100%);
             border-radius: 50%;
             opacity: 0;
-            transform: rotate(45deg);
-            box-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(135,206,250,0.6);
-            animation: meteorFall 2s ease-in;
+            transform: rotate(-45deg);
+            box-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 30px rgba(135,206,250,0.7);
+            animation: meteorFall 2.5s ease-in;
         }
 
         @keyframes meteorFall {
             0% {
                 opacity: 0;
-                transform: translate(0, 0) rotate(45deg);
+                transform: translate(0, 0) rotate(-45deg);
             }
-            10% {
+            5% {
                 opacity: 1;
             }
-            90% {
-                opacity: 1;
+            95% {
+                opacity: 0.8;
             }
             100% {
                 opacity: 0;
-                transform: translate(150vw, 100vh) rotate(45deg);
+                transform: translate(-120vw, 120vh) rotate(-45deg);
             }
         }
 
@@ -266,7 +265,7 @@
             transform: translate(-50%, -50%);
             width: 90%;
             max-width: 600px;
-            text-align: center;
+            text-align: left;
             z-index: 200;
             opacity: 0;
         }
@@ -281,8 +280,10 @@
             font-size: 20px;
             line-height: 1.8;
             text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             opacity: 0;
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+            font-weight: 400;
         }
 
         @keyframes fadeIn {
@@ -665,7 +666,7 @@
         function startMeteorShower() {
             const scene = document.querySelector('.scene');
             let meteorCount = 0;
-            const maxMeteors = 20;
+            const maxMeteors = 25;
 
             const meteorInterval = setInterval(() => {
                 if (meteorCount >= maxMeteors) {
@@ -676,18 +677,19 @@
 
                 const meteor = document.createElement('div');
                 meteor.className = 'meteor';
-                meteor.style.left = (Math.random() * 30) + '%';
-                meteor.style.top = (Math.random() * 30) + '%';
+                // 從右上角區域開始
+                meteor.style.right = (Math.random() * 20) + '%';
+                meteor.style.top = (Math.random() * 20) + '%';
                 meteor.style.animationDelay = '0s';
-                meteor.style.animationDuration = (Math.random() * 0.5 + 1.5) + 's';
+                meteor.style.animationDuration = (Math.random() * 0.8 + 2) + 's';
                 scene.appendChild(meteor);
 
                 setTimeout(() => {
                     meteor.remove();
-                }, 2500);
+                }, 3000);
 
                 meteorCount++;
-            }, 150);
+            }, 120);
         }
 
         // 顯示祝福文字(逐行逐字)
