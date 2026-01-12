@@ -502,6 +502,20 @@
         // Google Apps Script 網址
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk23JjUafTXn8jV3-0ayzGtITFgWZU3EfYMH43pVOdCQj1WAx5NxHhDF83a_4GdN8/exec';
         let allBlessings = [];
+        // 進入流星雨頁面時播放背景音樂（只播一次，然後一直 loop）
+function playMusic() {
+    const bgm = document.getElementById('bgm');
+    if (!bgm) return;
+
+    // 如果已經在播放，就不要再播一次
+    if (!bgm.paused) return;
+
+    bgm.volume = 0.6; // 音量，可自行調整
+    bgm.play().catch(err => {
+        console.log('音樂播放被瀏覽器阻擋：', err);
+    });
+}
+
 
         // 生成星空背景
         function createStarsBackground() {
@@ -543,6 +557,8 @@
 
         // 開始動畫
         function startAnimation() {
+            playMusic(); // ⭐ 一跳轉到流星雨頁面就開始播放音樂
+            
             document.getElementById('namePage').classList.remove('active');
             document.getElementById('animationPage').classList.add('active');
 
@@ -780,5 +796,9 @@
             }
         });
     </script>
+    <audio id="bgm" preload="auto" loop>
+  <source src="bgm.mp3" type="audio/mpeg">
+</audio>
+
 </body>
 </html>
